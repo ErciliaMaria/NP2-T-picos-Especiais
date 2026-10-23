@@ -13,8 +13,5 @@ private SimpleJpaRepository<Student,Long> repository;
 		SpringApplication.run(BackendApplication.class, args);
 	}
 
-	public void delete(Long id){
-		repository.deleteById(id);
-	}
 }
 
