@@ -1,6 +1,6 @@
 package br.edu.christus.backend.controller;
 
-import br.edu.christus.backend.domain.BookIntegration;
+import br.edu.christus.backend.domain.BookIntegrationDTO;
 import br.edu.christus.backend.service.BookIntegrationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +19,8 @@ public class BookIntegrationController {
     }
 
     @PostMapping("/import/{isbn}")
-    public ResponseEntity<BookIntegration> importBook(@PathVariable String isbn) {
-        BookIntegration savedBook = bookIntegrationService.importAndSaveBookByIsbn(isbn);
-        return ResponseEntity.ok(savedBook);
+    public ResponseEntity<BookIntegrationDTO> importBook(@PathVariable String isbn) {
+        BookIntegrationDTO savedBookDto = bookIntegrationService.importAndSaveBookByIsbn(isbn);
+        return ResponseEntity.ok(savedBookDto);
     }
 }
