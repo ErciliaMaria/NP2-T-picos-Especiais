@@ -1,6 +1,6 @@
 package br.edu.christus.backend;
 
-import br.edu.christus.backend.domain.Student;
+import br.edu.christus.backend.domain.Student.Student;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
