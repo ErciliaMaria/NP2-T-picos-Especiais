@@ -18,7 +18,6 @@ public class DeleteStudentService {
         if (!studentRepository.existsById(id)) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
-                    "Estudante não encontrado."
             );
         }
 
