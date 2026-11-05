@@ -10,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 @RequiredArgsConstructor
 public class DeleteStudentService {
-
     private final StudentRepository studentRepository;
 
     @Transactional

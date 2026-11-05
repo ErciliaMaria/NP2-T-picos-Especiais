@@ -32,7 +32,6 @@ public class CreateStudentService {
 
         Student studentSalvo = studentRepository.save(student);
 
-        // Retorna apenas nome completo e matrícula conforme solicitado
         return StudentDTO.builder()
                 .nomeCompleto(studentSalvo.getNomeCompleto())
                 .matricula(studentSalvo.getMatricula())

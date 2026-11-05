@@ -16,5 +16,6 @@ public class DeleteStudentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponse> deletar(@PathVariable Long id) {
         deleteStudentService.deletarAluno(id);
-        return ResponseEntity.ok(new MessageResponse("Estudante excluído com sucesso!"));    }
+        return ResponseEntity.ok(new MessageResponse("Estudante excluído com sucesso!"));
+    }
 }

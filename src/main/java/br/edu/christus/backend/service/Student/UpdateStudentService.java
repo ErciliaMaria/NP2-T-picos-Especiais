@@ -16,33 +16,19 @@ public class UpdateStudentService {
 
     @Transactional
     public StudentDTO atualizarAluno(Long id, StudentDTO dto) {
-        // 1. Busca o aluno existente pelo ID ou retorna 404 Not Found se não existir
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "Estudante não encontrado com o ID: " + id
+                        "Estudante não encontrado"
                 ));
 
-        // 2. Verifica se a matrícula foi alterada e se já pertence a outro aluno
-        if (dto.getMatricula() != null && !dto.getMatricula().equals(student.getMatricula())) {
-            if (studentRepository.existsByMatricula(dto.getMatricula())) {
-                throw new ResponseStatusException(
-                        HttpStatus.CONFLICT,
-                        "Já existe outro aluno cadastrado com esta matrícula."
-                );
-            }
-        }
-
-        // 3. Atualiza os dados da entidade com os valores recebidos do DTO
         student.setNomeCompleto(dto.getNomeCompleto());
         student.setMatricula(dto.getMatricula());
         student.setTurma(dto.getTurma());
         student.setDataNascimento(dto.getDataNascimento());
 
-        // 4. Salva as alterações no banco de dados
         Student studentSalvo = studentRepository.save(student);
 
-        // 5. Retorna o DTO atualizado
         return StudentDTO.builder()
                 .id(studentSalvo.getId())
                 .nomeCompleto(studentSalvo.getNomeCompleto())

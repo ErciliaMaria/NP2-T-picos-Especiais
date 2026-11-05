@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class GetStudentService {
-
     private final StudentRepository studentRepository;
 
     @Transactional(readOnly = true)
