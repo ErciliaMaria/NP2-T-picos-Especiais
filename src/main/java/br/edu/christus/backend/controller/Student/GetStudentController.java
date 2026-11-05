@@ -14,7 +14,6 @@ import java.util.List;
 @RequestMapping("/api/students")
 @RequiredArgsConstructor
 public class GetStudentController {
-
     private final GetStudentService getStudentsService;
 
     @GetMapping
