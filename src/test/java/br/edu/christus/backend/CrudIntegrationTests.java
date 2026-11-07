@@ -58,4 +58,53 @@ class CrudIntegrationTests {
         assertTrue(paths.get("/api/authors").has("post"));
         assertTrue(paths.get("/api/authors/{id}").has("get"));
     }
+
+    long createStudent() throws Exception {
+        String matricula = java.util.UUID.randomUUID().toString();
+        request("POST", "/api/students", Map.of("nome_completo", "Aluno Teste", "matricula", matricula,
+                "turma", "2A", "dataNascimento", "2009-03-12"), 201);
+        for (JsonNode student : request("GET", "/api/students", null, 200)) {
+            if (matricula.equals(student.get("matricula").asText())) return student.get("id").asLong();
+        }
+        throw new AssertionError("Aluno cadastrado não retornou na listagem");
+    }
+
+    long createBook() throws Exception {
+        return request("POST", "/api/books", Map.of("titulo", "Dom Casmurro", "autor", "Machado de Assis",
+                "editora", "Editora Teste", "anoPublicacao", 1899, "quantidadeExemplares", 3), 201).get("id").asLong();
+    }
+
+    @Test
+    void loanLifecycleRelationsAndDates() throws Exception {
+        long student = createStudent();
+        long book = createBook();
+        String path = "/api/loans";
+        Map<String, Object> loan = new java.util.HashMap<>(Map.of("alunoId", student, "livroId", book,
+                "dataEmprestimo", "2026-01-10", "dataPrevistaDevolucao", "2026-01-20", "observacoes", "Bom estado"));
+        long id = request("POST", path, loan, 201).get("id").asLong();
+        assertEquals(book, request("GET", path + "/" + id, null, 200).get("livroId").asLong());
+        assertTrue(request("GET", path, null, 200).isArray());
+        loan.put("dataDevolucao", "2026-01-19");
+        assertEquals("2026-01-19", request("PUT", path + "/" + id, loan, 200).get("dataDevolucao").asText());
+        request("DELETE", "/api/students/" + student, null, 409);
+        request("DELETE", "/api/books/" + book, null, 409);
+        loan.put("dataDevolucao", "2026-01-01");
+        request("PUT", path + "/" + id, loan, 400);
+        loan.remove("dataDevolucao");
+        loan.put("dataPrevistaDevolucao", "2026-01-01");
+        request("POST", path, loan, 400);
+        loan.put("dataPrevistaDevolucao", "2026-01-20");
+        loan.put("alunoId", 999999);
+        request("POST", path, loan, 404);
+        loan.put("alunoId", student);
+        loan.put("livroId", 999999);
+        request("POST", path, loan, 404);
+        loan.put("livroId", book);
+        request("DELETE", path + "/" + id, null, 204);
+        request("GET", path + "/" + id, null, 404);
+        request("PUT", path + "/" + id, loan, 404);
+        request("DELETE", path + "/" + id, null, 404);
+        request("DELETE", "/api/books/" + book, null, 200);
+        request("DELETE", "/api/students/" + student, null, 200);
+    }
 }
