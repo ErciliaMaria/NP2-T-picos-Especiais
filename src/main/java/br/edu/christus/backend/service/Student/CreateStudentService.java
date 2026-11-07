@@ -33,6 +33,9 @@ public class CreateStudentService {
         Student studentSalvo = studentRepository.save(student);
 
         return StudentDTO.builder()
+                .id(studentSalvo.getId())
+                .turma(studentSalvo.getTurma())
+                .dataNascimento(studentSalvo.getDataNascimento())
                 .nomeCompleto(studentSalvo.getNomeCompleto())
                 .matricula(studentSalvo.getMatricula())
                 .build();
