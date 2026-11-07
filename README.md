@@ -33,10 +33,12 @@ Swagger: http://localhost:8080/swagger-ui/index.html
 
 O Hibernate cria/atualiza tabelas com `ddl-auto: update`. Migrations não serão cobradas.
 
-## CRUDs de Magnum
+## Cinco CRUDs
 
 | Recurso | Rota | Campos do corpo |
 |---|---|---|
+| Aluno | `/api/students` | nome_completo, matricula, turma, dataNascimento |
+| Livro | `/api/books` | titulo, autor, editora, anoPublicacao, quantidadeExemplares |
 | Autor | `/api/authors` | nome, nacionalidade, dataNascimento, biografia |
 | Empréstimo | `/api/loans` | alunoId, livroId, dataEmprestimo, dataPrevistaDevolucao, dataDevolucao, observacoes |
 | Avaliação | `/api/reviews` | alunoId, livroId, titulo, nota, comentario, dataAvaliacao |
@@ -54,16 +56,23 @@ Validações: campos obrigatórios/tamanhos, nota entre 1 e 5, datas coerentes e
 Nos três novos CRUDs: cadastro 201, consulta/edição 200, exclusão 204; erros de entrada 400, registro inexistente 404 e conflito de integridade 409.
 Empréstimos não alteram automaticamente a quantidade de exemplares.
 
-## Situação da parte da Ercília
+## Complementos em Aluno, Livro e integração
 
-Aluno, Livro e integração foram preservados conforme o commit `3157ba8`, sem os complementos feitos posteriormente por IA. Nessa versão:
+A base dessas classes é da Ercília. Com autorização de Magnum, foram acrescentados consulta por ID, validações de entrada, retorno do ID no cadastro de Aluno e correções de mensagens. A listagem e as demais rotas foram mantidas. Matrícula repetida retorna 409 tanto no cadastro quanto na edição.
 
-- Aluno e Livro possuem cadastro, listagem, edição e exclusão; falta a consulta por ID exigida pelo enunciado.
-- `POST /api/books/import/{isbn}` ainda salva dados fictícios; a consulta externa não está implementada.
-- Livro mantém o autor como texto, sem vínculo com a entidade Autor.
-- Validações e mensagens dessa parte ainda precisam ser revisadas pela responsável.
+`POST /api/books/import/{isbn}` consulta a Open Library e grava o livro no acervo. Exemplo:
 
-Portanto, os três CRUDs de Magnum estão implementados; o projeto completo ainda tem pendências. A funcionalidade extra deve ser concluída e alinhada com o professor pela equipe.
+```text
+POST /api/books/import/9780140328721
+```
+
+A resposta contém `title`, `authors`, `isbn` e `livroId`. Use `livroId` para consultar o livro em `/api/books/{id}` ou criar empréstimos/avaliações. A rota mantém o retorno 200 que já existia.
+
+A importação aceita ISBN de 10 ou 13 caracteres no formato esperado e remove espaços/hífens; não calcula o dígito verificador. Retorna 400 para formato inválido, 404 se não encontrar o livro, 409 para ISBN já importado e 502 se a consulta externa falhar. Precisa de internet.
+
+Importamos título e autores, com um exemplar inicial. Editora e ano podem ser preenchidos depois pelo PUT de Livro. Textos externos são limitados ao tamanho das colunas existentes. `BookIntegration` guarda os dados da importação e aponta para `Book`, o livro do acervo. Ao excluir esse livro, seus metadados de importação também são removidos, permitindo importar novamente o mesmo ISBN.
+
+Livro continua com o autor como texto; não foi criado vínculo novo com Autor. Os relacionamentos obrigatórios de Empréstimo/Avaliação com Aluno/Livro permanecem. A equipe ainda deve confirmar com o professor o alinhamento da integração como funcionalidade extra.
 
 ## Verificação, estudo e IA
 
@@ -71,11 +80,11 @@ Portanto, os três CRUDs de Magnum estão implementados; o projeto completo aind
 bash mvnw clean verify
 ```
 
-Foi preservado o teste de inicialização `BackendApplicationTests`, configurado para H2. Os testes automatizados adicionais criados por IA foram retirados a pedido de redução de escopo. Nesta revisão, a compilação e o teste original passaram, e os três CRUDs foram verificados por requisições HTTP sem adicionar testes ao repositório. Você pode reproduzir a verificação no Swagger: cadastrar, listar, consultar, editar, excluir e conferir 400/404/409.
+Foi preservado o teste de inicialização `BackendApplicationTests`, configurado para H2. Os testes automatizados adicionais criados por IA foram retirados a pedido de redução de escopo. Nesta revisão, a compilação e o teste original passaram, e os cinco CRUDs foram verificados por requisições HTTP sem adicionar testes ao repositório. Você pode reproduzir a verificação no Swagger: cadastrar, listar, consultar, editar, excluir e conferir 400/404/409.
 
-Ferramenta utilizada: OpenAI Codex, para análise do projeto/material da aula, implementação dos três CRUDs, configuração, verificação e organização de commits. Os testes e complementos anteriores continuam registrados no histórico, mas não fazem parte desta versão. O estudo de compreensão de Magnum ainda será realizado com o [roteiro curto](docs/ESTUDO_E_DEMONSTRACAO.md).
+Ferramenta utilizada: OpenAI Codex, para análise do projeto/material da aula, implementação dos três CRUDs de Magnum, complementos em Aluno/Livro e integração, configuração, verificação e organização de commits. Os testes automatizados adicionais retirados continuam apenas no histórico. O estudo de compreensão de Magnum ainda será realizado com o [roteiro curto](docs/ESTUDO_E_DEMONSTRACAO.md).
 
-Próximos passos até a entrega: Magnum estudar e demonstrar sua parte; a dupla revisar as pendências, ensaiar e preparar a entrega. Não há alegação de contribuições semanais anteriores além das registradas no Git.
+Próximos passos até a entrega: Magnum estudar e demonstrar sua parte; a dupla revisar o código, ensaiar e preparar a entrega. Não há alegação de contribuições semanais anteriores além das registradas no Git.
 
 ## Entrega
 
