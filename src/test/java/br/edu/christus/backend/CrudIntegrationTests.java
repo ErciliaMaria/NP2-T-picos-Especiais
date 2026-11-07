@@ -140,4 +140,64 @@ class CrudIntegrationTests {
         request("DELETE", "/api/books/" + book, null, 200);
         request("DELETE", "/api/students/" + student, null, 200);
     }
+
+    @Test
+    void studentCrudAndDuplicateMatricula() throws Exception {
+        String path = "/api/students";
+        Map<String, Object> student = new java.util.HashMap<>(Map.of("nome_completo", "Ana Teste", "matricula",
+                java.util.UUID.randomUUID().toString(), "turma", "1A", "dataNascimento", "2010-01-01"));
+        long id = request("POST", path, student, 201).get("id").asLong();
+        assertEquals("Ana Teste", request("GET", path + "/" + id, null, 200).get("nome_completo").asText());
+        request("POST", path, student, 409);
+        student.put("turma", "2A");
+        assertEquals("2A", request("PUT", path + "/" + id, student, 200).get("turma").asText());
+        long second = createStudent();
+        request("PUT", path + "/" + second, student, 409);
+        student.put("nome_completo", " ");
+        request("POST", path, student, 400);
+        student.put("nome_completo", "Ana Teste");
+        request("DELETE", path + "/" + id, null, 200);
+        request("GET", path + "/" + id, null, 404);
+        request("PUT", path + "/" + id, student, 404);
+        request("DELETE", path + "/" + id, null, 404);
+        request("DELETE", path + "/" + second, null, 200);
+    }
+
+    @Test
+    void bookCrudAndAuthorLink() throws Exception {
+        long author = request("POST", "/api/authors", Map.of("nome", "Machado de Assis", "nacionalidade", "Brasileira",
+                "dataNascimento", "1839-06-21", "biografia", "Escritor"), 201).get("id").asLong();
+        Map<String, Object> book = new java.util.HashMap<>(Map.of("titulo", "Dom Casmurro", "autor", "Machado de Assis",
+                "autorId", author, "editora", "Teste", "anoPublicacao", 1899, "quantidadeExemplares", 3));
+        String path = "/api/books";
+        long id = request("POST", path, book, 201).get("id").asLong();
+        assertEquals(author, request("GET", path + "/" + id, null, 200).get("autorId").asLong());
+        request("DELETE", "/api/authors/" + author, null, 409);
+        book.put("quantidadeExemplares", 4);
+        assertEquals(4, request("PUT", path + "/" + id, book, 200).get("quantidadeExemplares").asInt());
+        book.put("quantidadeExemplares", -1);
+        request("POST", path, book, 400);
+        book.put("quantidadeExemplares", 4);
+        book.put("autorId", 999999);
+        request("POST", path, book, 404);
+        book.put("autorId", author);
+        request("DELETE", path + "/" + id, null, 200);
+        request("GET", path + "/" + id, null, 404);
+        request("PUT", path + "/" + id, book, 404);
+        request("DELETE", path + "/" + id, null, 404);
+        request("DELETE", "/api/authors/" + author, null, 204);
+    }
+
+    @Test
+    void allCrudRoutesAreDocumented() throws Exception {
+        JsonNode paths = request("GET", "/v3/api-docs", null, 200).get("paths");
+        for (String name : java.util.List.of("authors", "books", "students", "loans", "reviews")) {
+            assertTrue(paths.get("/api/" + name).has("post"), name);
+            assertTrue(paths.get("/api/" + name).has("get"), name);
+            for (String verb : java.util.List.of("get", "put", "delete")) {
+                assertTrue(paths.get("/api/" + name + "/{id}").has(verb), name + " " + verb);
+            }
+        }
+        assertTrue(paths.get("/api/books/import/{isbn}").has("post"));
+    }
 }

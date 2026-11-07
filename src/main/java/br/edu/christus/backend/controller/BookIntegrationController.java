@@ -18,6 +18,7 @@ public class BookIntegrationController {
         this.bookIntegrationService = bookIntegrationService;
     }
 
+    @io.swagger.v3.oas.annotations.Operation(summary = "Importar livro da Open Library pelo ISBN", tags = "Integração")
     @PostMapping("/import/{isbn}")
     public ResponseEntity<BookIntegrationDTO> importBook(@PathVariable String isbn) {
         BookIntegrationDTO savedBookDto = bookIntegrationService.importAndSaveBookByIsbn(isbn);
