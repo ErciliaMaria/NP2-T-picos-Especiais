@@ -107,4 +107,37 @@ class CrudIntegrationTests {
         request("DELETE", "/api/books/" + book, null, 200);
         request("DELETE", "/api/students/" + student, null, 200);
     }
+
+    @Test
+    void reviewLifecycleAndValidation() throws Exception {
+        long student = createStudent();
+        long book = createBook();
+        String path = "/api/reviews";
+        Map<String, Object> review = new java.util.HashMap<>(Map.of("alunoId", student, "livroId", book,
+                "titulo", "Boa leitura", "nota", 5, "comentario", "Gostei da história", "dataAvaliacao", "2026-01-20"));
+        long id = request("POST", path, review, 201).get("id").asLong();
+        assertEquals(5, request("GET", path + "/" + id, null, 200).get("nota").asInt());
+        assertTrue(request("GET", path, null, 200).isArray());
+        review.put("nota", 4);
+        assertEquals(4, request("PUT", path + "/" + id, review, 200).get("nota").asInt());
+        request("DELETE", "/api/students/" + student, null, 409);
+        request("DELETE", "/api/books/" + book, null, 409);
+        review.put("nota", 6);
+        request("POST", path, review, 400);
+        review.put("nota", 0);
+        request("PUT", path + "/" + id, review, 400);
+        review.put("nota", 4);
+        review.put("alunoId", 999999);
+        request("POST", path, review, 404);
+        review.put("alunoId", student);
+        review.put("livroId", 999999);
+        request("POST", path, review, 404);
+        review.put("livroId", book);
+        request("DELETE", path + "/" + id, null, 204);
+        request("GET", path + "/" + id, null, 404);
+        request("PUT", path + "/" + id, review, 404);
+        request("DELETE", path + "/" + id, null, 404);
+        request("DELETE", "/api/books/" + book, null, 200);
+        request("DELETE", "/api/students/" + student, null, 200);
+    }
 }
