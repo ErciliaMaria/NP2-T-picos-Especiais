@@ -4,6 +4,8 @@ import br.edu.christus.backend.domain.Student.StudentDTO;
 import br.edu.christus.backend.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -25,5 +27,18 @@ public class GetStudentService {
                         .dataNascimento(student.getDataNascimento())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public StudentDTO buscarPorId(Long id) {
+        var student = studentRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Aluno não encontrado"));
+        return StudentDTO.builder()
+                .id(student.getId())
+                .nomeCompleto(student.getNomeCompleto())
+                .matricula(student.getMatricula())
+                .turma(student.getTurma())
+                .dataNascimento(student.getDataNascimento())
+                .build();
     }
 }
