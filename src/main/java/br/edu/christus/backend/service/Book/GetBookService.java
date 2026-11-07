@@ -19,6 +19,7 @@ public class GetBookService {
         return bookRepository.findAll().stream()
                 .map(book -> BookDTO.builder()
                         .id(book.getId())
+                        .autorId(book.getAutorCadastrado() == null ? null : book.getAutorCadastrado().getId())
                         .titulo(book.getTitulo())
                         .autor(book.getAutor())
                         .editora(book.getEditora())
@@ -26,5 +27,20 @@ public class GetBookService {
                         .quantidadeExemplares(book.getQuantidadeExemplares())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public BookDTO buscarPorId(Long id) {
+        var book = bookRepository.findById(id).orElseThrow(() ->
+                new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "Livro não encontrado"));
+        return BookDTO.builder()
+                        .id(book.getId())
+                        .autorId(book.getAutorCadastrado() == null ? null : book.getAutorCadastrado().getId())
+                        .titulo(book.getTitulo())
+                        .autor(book.getAutor())
+                        .editora(book.getEditora())
+                        .anoPublicacao(book.getAnoPublicacao())
+                        .quantidadeExemplares(book.getQuantidadeExemplares())
+                        .build();
     }
 }

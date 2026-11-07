@@ -29,4 +29,7 @@ public class Book {
 
     @Column(nullable = false)
     private Integer quantidadeExemplares;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "autor_id")
+    private br.edu.christus.backend.domain.Author.Author autorCadastrado;
 }
