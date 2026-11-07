@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class CreateBookService {
 
     private final BookRepository bookRepository;
-    private final br.edu.christus.backend.repository.AuthorRepository authorRepository;
 
     @Transactional
     public BookDTO criarLivro(BookDTO dto) {
@@ -25,17 +24,10 @@ public class CreateBookService {
                 .quantidadeExemplares(dto.getQuantidadeExemplares())
                 .build();
 
-        if (dto.getAutorId() != null) {
-            book.setAutorCadastrado(authorRepository.findById(dto.getAutorId()).orElseThrow(() ->
-                    new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "Autor não encontrado")));
-        } else {
-            book.setAutorCadastrado(null);
-        }
         Book bookSalvo = bookRepository.save(book);
 
         return BookDTO.builder()
                 .id(bookSalvo.getId())
-                .autorId(bookSalvo.getAutorCadastrado() == null ? null : bookSalvo.getAutorCadastrado().getId())
                 .titulo(bookSalvo.getTitulo())
                 .autor(bookSalvo.getAutor())
                 .editora(bookSalvo.getEditora())

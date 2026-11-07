@@ -35,8 +35,4 @@ public class BookIntegration {
 
     @Column(length = 1000)
     private String coverUrl;
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "livro_id", unique = true)
-    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
-    private br.edu.christus.backend.domain.Book.Book livro;
 }

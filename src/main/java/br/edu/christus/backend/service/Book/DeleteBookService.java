@@ -17,11 +17,11 @@ public class DeleteBookService {
         if (!bookRepository.existsById(id)) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
-                    "Livro não encontrado"
+                    "Estudante não encontrado"
             );
         }
 
         bookRepository.deleteById(id);
-        return "Livro excluído com sucesso!";
+        return "Estudante excluído com sucesso!";
     }
 }
