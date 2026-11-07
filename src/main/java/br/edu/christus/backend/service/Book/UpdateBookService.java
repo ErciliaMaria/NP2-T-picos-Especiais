@@ -14,7 +14,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class UpdateBookService {
 
     private final BookRepository bookRepository;
-    private final br.edu.christus.backend.repository.AuthorRepository authorRepository;
 
     @Transactional
     public BookDTO atualizarLivro(Long id, BookDTO dto) {
@@ -30,17 +29,10 @@ public class UpdateBookService {
         book.setAnoPublicacao(dto.getAnoPublicacao());
         book.setQuantidadeExemplares(dto.getQuantidadeExemplares());
 
-        if (dto.getAutorId() != null) {
-            book.setAutorCadastrado(authorRepository.findById(dto.getAutorId()).orElseThrow(() ->
-                    new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "Autor não encontrado")));
-        } else {
-            book.setAutorCadastrado(null);
-        }
         Book bookSalvo = bookRepository.save(book);
 
         return BookDTO.builder()
                 .id(bookSalvo.getId())
-                .autorId(bookSalvo.getAutorCadastrado() == null ? null : bookSalvo.getAutorCadastrado().getId())
                 .titulo(bookSalvo.getTitulo())
                 .autor(bookSalvo.getAutor())
                 .editora(bookSalvo.getEditora())
