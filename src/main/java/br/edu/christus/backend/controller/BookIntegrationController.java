@@ -3,6 +3,7 @@ package br.edu.christus.backend.controller;
 import br.edu.christus.backend.domain.BookIntegrationDTO;
 import br.edu.christus.backend.service.BookIntegrationService;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ public class BookIntegrationController {
         this.bookIntegrationService = bookIntegrationService;
     }
 
+    @Operation(summary = "Importar livro da Open Library pelo ISBN", tags = "Integração")
     @PostMapping("/import/{isbn}")
     public ResponseEntity<BookIntegrationDTO> importBook(@PathVariable String isbn) {
         BookIntegrationDTO savedBookDto = bookIntegrationService.importAndSaveBookByIsbn(isbn);
