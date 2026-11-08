@@ -22,9 +22,6 @@ public class UpdateStudentService {
                         "Estudante não encontrado"
                 ));
 
-        if (studentRepository.existsByMatriculaAndIdNot(dto.getMatricula(), id)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um aluno cadastrado com esta matrícula.");
-        }
         student.setNomeCompleto(dto.getNomeCompleto());
         student.setMatricula(dto.getMatricula());
         student.setTurma(dto.getTurma());
