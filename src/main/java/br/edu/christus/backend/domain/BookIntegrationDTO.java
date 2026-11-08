@@ -5,6 +5,4 @@ import lombok.Data;
 public class BookIntegrationDTO {
     private String title;
     private String authors;
-    private Long livroId;
-    private String isbn;
 }

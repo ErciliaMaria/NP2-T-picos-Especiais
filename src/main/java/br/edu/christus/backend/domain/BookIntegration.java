@@ -1,9 +1,6 @@
 package br.edu.christus.backend.domain;
 import jakarta.persistence.*;
 import lombok.*;
-import br.edu.christus.backend.domain.Book.Book;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "books")
@@ -38,9 +35,4 @@ public class BookIntegration {
 
     @Column(length = 1000)
     private String coverUrl;
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "livro_id", unique = true)
-    // Ao excluir o livro, o banco também remove os metadados desta importação.
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Book livro;
 }
